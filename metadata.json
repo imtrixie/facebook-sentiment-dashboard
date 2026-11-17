@@ -1,0 +1,8 @@
+{
+  "name": "Facebook Sentiment Analysis Dashboard",
+  "description": "Dashboard phân tích cảm xúc bài đăng Facebook với thống kê KPI, biểu đồ phân bố, phân tích tương tác, bộ lọc dữ liệu và mô hình dự đoán Machine Learning (Naive Bayes & Decision Tree).",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
