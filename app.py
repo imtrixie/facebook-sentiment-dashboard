@@ -25,6 +25,18 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
 
+# Ép cấu hình Light Theme trực tiếp trong code (phòng trường hợp thiếu .streamlit/config.toml)
+try:
+    from streamlit import config as _st_config
+
+    _st_config.set_option("theme.base", "light")
+    _st_config.set_option("theme.primaryColor", "#4F26A6")
+    _st_config.set_option("theme.backgroundColor", "#EEF4FB")
+    _st_config.set_option("theme.secondaryBackgroundColor", "#FFFFFF")
+    _st_config.set_option("theme.textColor", "#14143A")
+except Exception:
+    pass
+
 # ==============================================================================
 # CẤU HÌNH TRANG & HẰNG SỐ MÀU SẮC
 # ==============================================================================
@@ -61,7 +73,7 @@ SENTIMENT_DISPLAY_COLORS = {
 
 
 # ==============================================================================
-# GIAO DIỆN & CSS (ÉP LIGHT THEME ĐỒNG BỘ, CHỐNG LỖI DARK MODE)
+# GIAO DIỆN & CSS (ĐỒNG BỘ HOÀN TOÀN VỚI BẢN PREVIEW, CHỐNG DARK MODE)
 # ==============================================================================
 def inject_custom_css() -> None:
     st.markdown(
@@ -69,13 +81,18 @@ def inject_custom_css() -> None:
         <style>
             @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-            :root {
+            :root,
+            .stApp {
                 color-scheme: light !important;
+                --primary-color: #4F26A6 !important;
+                --background-color: #EEF4FB !important;
+                --secondary-background-color: #FFFFFF !important;
+                --text-color: #14143A !important;
             }
 
             html, body, [class*="css"] {
                 font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-                color: #14143A;
+                color: #14143A !important;
             }
 
             .stApp,
@@ -86,12 +103,11 @@ def inject_custom_css() -> None:
             }
 
             header[data-testid="stHeader"] {
-                background: rgba(238, 244, 251, 0.92) !important;
-                backdrop-filter: blur(8px);
-                border-bottom: 1px solid #CFE0F5;
+                background: transparent !important;
+                border-bottom: none !important;
             }
 
-            /* Ép màu chữ sáng rõ trên toàn trang & sidebar */
+            /* Chữ rõ nét trên toàn bộ trang & sidebar */
             [data-testid="stMain"] p,
             [data-testid="stMain"] span,
             [data-testid="stMain"] label,
@@ -104,7 +120,8 @@ def inject_custom_css() -> None:
             section[data-testid="stSidebar"] label,
             section[data-testid="stSidebar"] h1,
             section[data-testid="stSidebar"] h2,
-            section[data-testid="stSidebar"] h3 {
+            section[data-testid="stSidebar"] h3,
+            section[data-testid="stSidebar"] div {
                 color: #14143A;
             }
 
@@ -113,45 +130,69 @@ def inject_custom_css() -> None:
                 color: #51617A !important;
             }
 
-            /* Sidebar sáng & sắc nét */
-            section[data-testid="stSidebar"] {
+            /* Sidebar nền trắng, chữ tối sắc nét */
+            section[data-testid="stSidebar"],
+            section[data-testid="stSidebar"] > div {
                 background-color: #FFFFFF !important;
                 border-right: 1px solid #CFE0F5 !important;
             }
-            section[data-testid="stSidebar"] [data-testid="stExpander"] {
+            section[data-testid="stSidebar"] [data-testid="stExpander"],
+            section[data-testid="stSidebar"] details {
                 background-color: #F8FBFF !important;
                 border: 1px solid #CFE0F5 !important;
                 border-radius: 10px !important;
             }
-            section[data-testid="stSidebar"] [data-testid="stExpander"] summary {
+            section[data-testid="stSidebar"] [data-testid="stExpander"] summary,
+            section[data-testid="stSidebar"] details summary {
                 background-color: #F4F8FD !important;
                 color: #14143A !important;
                 border-radius: 10px !important;
             }
+            section[data-testid="stSidebar"] [data-testid="stExpander"] summary svg {
+                fill: #14143A !important;
+                color: #14143A !important;
+            }
 
-            /* Inputs, Selectbox, Multiselect (khắc phục nền đen & tag đỏ của Dark Mode) */
+            /* Ghi đè triệt để BaseWeb Selectbox, Multiselect, Input (chống nền đen & tag đỏ) */
+            div[data-baseweb="select"],
             div[data-baseweb="select"] > div,
+            div[data-baseweb="select"] > div > div,
+            div[data-baseweb="input"],
             div[data-baseweb="input"] > div,
+            div[data-baseweb="base-input"],
             div[data-baseweb="base-input"] > textarea,
             div[data-baseweb="base-input"] > input {
                 background-color: #FFFFFF !important;
                 border-color: #C2DCF5 !important;
                 color: #14143A !important;
             }
+            div[data-baseweb="select"] span,
+            div[data-baseweb="select"] input {
+                color: #14143A !important;
+            }
             div[data-baseweb="select"] svg {
                 fill: #334155 !important;
+                color: #334155 !important;
             }
+            div[data-baseweb="popover"],
+            div[data-baseweb="popover"] > div,
             div[data-baseweb="popover"] ul,
             ul[role="listbox"] {
                 background-color: #FFFFFF !important;
                 color: #14143A !important;
+                border: 1px solid #CFE0F5 !important;
             }
             li[role="option"] {
+                background-color: #FFFFFF !important;
                 color: #14143A !important;
             }
-            li[role="option"]:hover {
+            li[role="option"]:hover,
+            li[role="option"][aria-selected="true"] {
                 background-color: #EEF4FB !important;
+                color: #0D47A1 !important;
             }
+
+            /* Thẻ tag Multiselect: nền xanh dương nhạt chữ xanh đậm */
             span[data-baseweb="tag"] {
                 background-color: #E0ECFF !important;
                 color: #0D47A1 !important;
@@ -160,13 +201,14 @@ def inject_custom_css() -> None:
             }
             span[data-baseweb="tag"] span {
                 color: #0D47A1 !important;
-                font-weight: 500 !important;
+                font-weight: 600 !important;
             }
             span[data-baseweb="tag"] svg {
                 fill: #0D47A1 !important;
+                color: #0D47A1 !important;
             }
 
-            /* Checkbox & Radio accent */
+            /* Checkbox & Radio */
             input[type="checkbox"],
             input[type="radio"] {
                 accent-color: #4F26A6 !important;
@@ -174,10 +216,10 @@ def inject_custom_css() -> None:
             div[data-testid="stRadio"] label p,
             div[data-testid="stCheckbox"] label p {
                 color: #14143A !important;
-                font-weight: 500;
+                font-weight: 500 !important;
             }
 
-            /* Buttons */
+            /* Nút bấm */
             button[kind="primary"] {
                 background-color: #4F26A6 !important;
                 color: #FFFFFF !important;
@@ -193,19 +235,19 @@ def inject_custom_css() -> None:
             }
             div[data-testid="stDownloadButton"] button,
             button[kind="secondary"] {
-                background-color: #FFFFFF !important;
-                color: #0D47A1 !important;
-                border: 1px solid #C2DCF5 !important;
+                background-color: #4F26A6 !important;
+                color: #FFFFFF !important;
+                border: none !important;
                 border-radius: 8px !important;
             }
             div[data-testid="stDownloadButton"] button p,
             button[kind="secondary"] p {
-                color: #0D47A1 !important;
+                color: #FFFFFF !important;
                 font-weight: 600 !important;
             }
 
             .block-container {
-                padding-top: 1.5rem;
+                padding-top: 1.25rem;
                 padding-bottom: 3rem;
                 max-width: 1460px;
             }
@@ -214,7 +256,7 @@ def inject_custom_css() -> None:
             .dashboard-header {
                 background: linear-gradient(115deg, #07327A 0%, #0D47A1 58%, #4F26A6 100%);
                 border-radius: 14px;
-                padding: 1.25rem 1.6rem;
+                padding: 1.15rem 1.5rem;
                 margin-bottom: 1.15rem;
                 display: flex;
                 flex-wrap: wrap;
@@ -223,8 +265,24 @@ def inject_custom_css() -> None:
                 gap: 1rem;
                 box-shadow: 0 6px 20px rgba(7, 50, 122, 0.16);
             }
+            .header-brand {
+                display: flex;
+                align-items: center;
+                gap: 0.9rem;
+            }
+            .header-icon-box {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                background: #FFFFFF;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            }
             .dashboard-title {
-                font-size: 1.45rem;
+                font-size: 1.35rem;
                 font-weight: 700;
                 color: #FFFFFF !important;
                 letter-spacing: -0.02em;
@@ -232,41 +290,36 @@ def inject_custom_css() -> None:
                 line-height: 1.25;
             }
             .dashboard-subtitle {
-                font-size: 0.875rem;
+                font-size: 0.84rem;
                 color: rgba(255, 255, 255, 0.86) !important;
-                margin: 0.25rem 0 0 0;
+                margin: 0.2rem 0 0 0;
             }
             .dashboard-meta {
                 font-family: 'IBM Plex Mono', monospace;
                 font-size: 0.78rem;
                 color: #FFFFFF !important;
-                background: rgba(255, 255, 255, 0.14);
+                background: rgba(255, 255, 255, 0.15);
                 border: 1px solid rgba(255, 255, 255, 0.28);
                 border-radius: 8px;
-                padding: 0.5rem 0.9rem;
+                padding: 0.45rem 0.85rem;
                 font-variant-numeric: tabular-nums;
             }
 
-            /* Khay KPI xanh băng nhẹ bọc đúng 4 thẻ KPI */
-            div[data-testid="stVerticalBlockBorderWrapper"]:has(.kpi-tray-marker),
-            div[data-testid="stVerticalBlock"]:has(> div.element-container .kpi-tray-marker) {
+            /* Khay KPI xanh băng nhẹ bọc TRỰC TIẾP 4 cột KPI (không tạo thanh rỗng) */
+            div[data-testid="stHorizontalBlock"]:has(div[data-testid="stMetric"]) {
                 background-color: #D8EAF9 !important;
                 border: 1px solid #C2DCF5 !important;
                 border-radius: 16px !important;
-                padding: 0.95rem 1rem 1rem 1rem !important;
-                margin-bottom: 0.85rem !important;
-            }
-            .kpi-tray-marker {
-                display: none;
+                padding: 1rem !important;
+                margin-bottom: 1rem !important;
             }
 
             /* KPI Cards */
             div[data-testid="stMetric"] {
                 background-color: #FFFFFF !important;
-                border: 1.5px solid #C7DBF4;
-                border-radius: 12px;
-                padding: 0.95rem 1.15rem;
-                box-shadow: 0 2px 6px rgba(20, 20, 58, 0.04);
+                border-radius: 12px !important;
+                padding: 0.95rem 1.15rem !important;
+                box-shadow: 0 2px 6px rgba(20, 20, 58, 0.04) !important;
             }
             div[data-testid="stMetricLabel"] p {
                 font-size: 0.82rem !important;
@@ -290,7 +343,7 @@ def inject_custom_css() -> None:
                 font-weight: 600 !important;
             }
 
-            /* Viền màu cho 4 thẻ KPI */
+            /* Viền màu riêng cho từng thẻ KPI (Tổng: Tím, Tích cực: Xanh lá, Trung lập: Cam, Tiêu cực: Đỏ) */
             div[data-testid="stHorizontalBlock"]:has(div[data-testid="stMetric"]) > div[data-testid="stColumn"]:nth-child(1) div[data-testid="stMetric"] {
                 border: 1.5px solid #A855F7 !important;
             }
@@ -304,7 +357,7 @@ def inject_custom_css() -> None:
                 border: 1.5px solid #F43F5E !important;
             }
 
-            /* Tabs styling rõ nét */
+            /* Tabs rõ nét */
             div[data-testid="stTabs"] [data-baseweb="tab-list"] {
                 border-bottom: 1px solid #CFE0F5 !important;
                 gap: 0.5rem;
@@ -316,9 +369,12 @@ def inject_custom_css() -> None:
                 color: #51617A !important;
                 background: transparent !important;
             }
-            div[data-testid="stTabs"] button[role="tab"] p {
-                color: inherit !important;
+            div[data-testid="stTabs"] button[role="tab"] p,
+            div[data-testid="stTabs"] button[role="tab"] span {
+                color: #51617A !important;
             }
+            div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p,
+            div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] span,
             div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
                 color: #0D47A1 !important;
             }
@@ -347,12 +403,12 @@ def inject_custom_css() -> None:
                 margin-bottom: 0.75rem;
             }
 
-            /* Card trắng có viền xanh băng */
-            div[data-testid="stVerticalBlockBorderWrapper"] {
+            /* Card trắng có viền xanh băng (tương thích mọi phiên bản Streamlit) */
+            div[data-testid="stVerticalBlockBorderWrapper"],
+            div[data-testid="stLayoutWrapper"] > div {
                 background-color: #FFFFFF !important;
                 border-color: #CFE0F5 !important;
                 border-radius: 12px !important;
-                box-shadow: 0 2px 6px rgba(20, 20, 58, 0.03);
             }
         </style>
         """,
@@ -565,7 +621,7 @@ def render_sidebar_filters(df: pd.DataFrame) -> tuple[pd.DataFrame, str, str]:
             horizontal=True,
         )
 
-    st.sidebar.markdown("### 🔍 Tiêu chí lọc dữ liệu")
+    st.sidebar.markdown("### Tiêu chí lọc dữ liệu")
 
     all_categories = sorted(df["category"].unique().tolist())
     select_all_cat = st.sidebar.checkbox("Chọn tất cả danh mục", value=True)
@@ -620,6 +676,12 @@ def render_sidebar_filters(df: pd.DataFrame) -> tuple[pd.DataFrame, str, str]:
 # A. THỐNG KÊ TỔNG QUAN (KPI CARDS TRONG KHAY XANH BĂNG NHẸ)
 # ==============================================================================
 def render_kpi_section(filtered_df: pd.DataFrame) -> None:
+    st.markdown('<div class="section-heading">A. Thống kê tổng quan</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-caption">Chỉ số KPI cập nhật đồng bộ theo bộ lọc hiện tại.</div>',
+        unsafe_allow_html=True,
+    )
+
     total_posts = len(filtered_df)
     pos_count = int((filtered_df["sentiment"] == "positive").sum())
     neu_count = int((filtered_df["sentiment"] == "neutral").sum())
@@ -629,44 +691,42 @@ def render_kpi_section(filtered_df: pd.DataFrame) -> None:
     neu_pct = (neu_count / total_posts * 100) if total_posts > 0 else 0.0
     neg_pct = (neg_count / total_posts * 100) if total_posts > 0 else 0.0
 
-    with st.container(border=True):
-        st.markdown('<span class="kpi-tray-marker"></span>', unsafe_allow_html=True)
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric(
-                label="Tổng số bài đăng",
-                value=f"{total_posts:,}",
-                delta="100.0% dữ liệu đang lọc",
-                delta_color="off",
-            )
-        with col2:
-            st.metric(
-                label="Tích cực (Positive)",
-                value=f"{pos_count:,} ({pos_pct:.1f}%)",
-                delta=f"Chiếm {pos_pct:.1f}% tổng bài",
-                delta_color="normal",
-            )
-        with col3:
-            st.metric(
-                label="Trung lập (Neutral)",
-                value=f"{neu_count:,} ({neu_pct:.1f}%)",
-                delta=f"Chiếm {neu_pct:.1f}% tổng bài",
-                delta_color="off",
-            )
-        with col4:
-            st.metric(
-                label="Tiêu cực (Negative)",
-                value=f"{neg_count:,} ({neg_pct:.1f}%)",
-                delta=f"Chiếm {neg_pct:.1f}% tổng bài",
-                delta_color="inverse",
-            )
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric(
+            label="Tổng số bài đăng",
+            value=f"{total_posts:,}",
+            delta="100.0% dữ liệu đang lọc",
+            delta_color="off",
+        )
+    with col2:
+        st.metric(
+            label="Tích cực (Positive)",
+            value=f"{pos_count:,} ({pos_pct:.1f}%)",
+            delta=f"Chiếm {pos_pct:.1f}% tổng bài",
+            delta_color="normal",
+        )
+    with col3:
+        st.metric(
+            label="Trung lập (Neutral)",
+            value=f"{neu_count:,} ({neu_pct:.1f}%)",
+            delta=f"Chiếm {neu_pct:.1f}% tổng bài",
+            delta_color="off",
+        )
+    with col4:
+        st.metric(
+            label="Tiêu cực (Negative)",
+            value=f"{neg_count:,} ({neg_pct:.1f}%)",
+            delta=f"Chiếm {neg_pct:.1f}% tổng bài",
+            delta_color="inverse",
+        )
 
 
 # ==============================================================================
 # B & C. BIỂU ĐỒ PHÂN BỐ & PHÂN TÍCH TƯƠNG TÁC
 # ==============================================================================
 def render_distribution_charts(filtered_df: pd.DataFrame) -> None:
-    st.markdown('<div class="section-heading">Phân bố cảm xúc bài đăng</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-heading">B. Biểu đồ phân bố cảm xúc</div>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-caption">Đối chiếu số lượng và tỷ trọng ba nhóm cảm xúc (Positive: Xanh lá, Neutral: Cam, Negative: Đỏ).</div>',
         unsafe_allow_html=True,
@@ -759,7 +819,7 @@ def render_engagement_analysis(filtered_df: pd.DataFrame) -> None:
     head_col, toggle_col = st.columns([1.6, 1.0])
     with head_col:
         st.markdown(
-            '<div class="section-heading">Phân tích mức độ tương tác theo cảm xúc</div>',
+            '<div class="section-heading">C. Phân tích mức độ tương tác theo cảm xúc</div>',
             unsafe_allow_html=True,
         )
         st.markdown(
@@ -916,7 +976,7 @@ def render_posts_table_section(
     filtered_df: pd.DataFrame,
     selected_model: str,
 ) -> None:
-    st.markdown('<div class="section-heading">Danh sách bài đăng & Kết quả dự đoán</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-heading">E. Danh sách bài đăng & Kết quả dự đoán</div>', unsafe_allow_html=True)
     st.markdown(
         f'<div class="section-caption">Đối chiếu nhãn cảm xúc thực tế và nhãn dự đoán ngoài mẫu từ mô hình <b>{selected_model}</b>.</div>',
         unsafe_allow_html=True,
@@ -1029,7 +1089,7 @@ def render_live_prediction_section(
     default_model: str,
     vectorizer_type: str,
 ) -> None:
-    st.markdown('<div class="section-heading">Đánh giá mô hình & Dự đoán trực tiếp</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-heading">F. Đánh giá mô hình & Dự đoán trực tiếp</div>', unsafe_allow_html=True)
     st.markdown(
         f'<div class="section-caption">Huấn luyện bằng Train/Test Split (80%/20%) và trích xuất đặc trưng <b>{vectorizer_type}</b>. '
         "Đánh giá hiệu năng độc lập trên tập kiểm thử.</div>",
@@ -1109,7 +1169,7 @@ def render_live_prediction_section(
                 index=0 if default_model == "Naive Bayes" else 1,
                 horizontal=True,
             )
-            predict_clicked = st.button("🚀 Dự đoán cảm xúc", type="primary", use_container_width=True)
+            predict_clicked = st.button("Dự đoán cảm xúc", type="primary", use_container_width=True)
 
     with result_col:
         with st.container(border=True):
@@ -1209,15 +1269,22 @@ def main() -> None:
     raw_with_pred["predicted_sentiment"] = ml_results[selected_model]["oof_predictions"]
     filtered_with_pred = raw_with_pred.loc[filtered_df.index].copy()
 
-    # Header Banner đồng bộ phong cách Facebook Navy -> Indigo
+    # Header Banner đồng bộ phong cách Facebook Navy -> Indigo giống Preview
     st.markdown(
         f"""
         <div class="dashboard-header">
-            <div>
-                <h1 class="dashboard-title">📊 Facebook Sentiment Analysis Dashboard</h1>
-                <p class="dashboard-subtitle">
-                    Phân tích cảm xúc bài đăng Facebook, đối chiếu mức độ tương tác và dự đoán bằng Machine Learning.
-                </p>
+            <div class="header-brand">
+                <div class="header-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0D47A1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="dashboard-title">Facebook Sentiment Analysis Dashboard</h1>
+                    <p class="dashboard-subtitle">
+                        Phân tích cảm xúc bài đăng Facebook, đối chiếu mức độ tương tác và dự đoán bằng Machine Learning.
+                    </p>
+                </div>
             </div>
             <div class="dashboard-meta">
                 {len(filtered_with_pred):,} / {len(raw_df):,} bài đăng · {selected_model} · {selected_vectorizer}
@@ -1240,9 +1307,9 @@ def main() -> None:
     # Tổ chức nội dung chi tiết thành 3 Tab gọn gàng
     tab_viz, tab_data, tab_ml = st.tabs(
         [
-            "📊 Phân tích trực quan",
-            f"📋 Danh sách bài đăng ({len(filtered_with_pred):,})",
-            "🤖 Dự đoán & Đánh giá ML",
+            "Phân tích trực quan (Biểu đồ & Tương tác)",
+            f"Danh sách bài đăng ({len(filtered_with_pred):,})",
+            "Dự đoán & Đánh giá ML",
         ]
     )
 
