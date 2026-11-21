@@ -200,6 +200,8 @@ def inject_custom_css() -> None:
             .stDownloadButton > button:hover { background: #1E293B; color: #fff; }
             .stDownloadButton > button p { color: #fff; }
             div[data-testid="stSegmentedControl"] button { font-size: 0.8rem; }
+            .stButton > button { padding-left: 0.5rem; padding-right: 0.5rem; }
+            .stButton > button p { white-space: nowrap; overflow: visible; text-overflow: clip; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -919,10 +921,11 @@ def render_live_prediction_section(
     with left:
         with st.container(border=True):
             card_title("Nhập nội dung bài đăng Facebook mới")
-            b1, b2, b3, _sp = st.columns([1, 1, 1.15, 1.3])
-            b1.button("Mẫu Tích cực", on_click=_set_sample, args=("positive",), width="stretch")
-            b2.button("Mẫu Tiêu cực", on_click=_set_sample, args=("negative",), width="stretch")
-            b3.button("Mẫu Trung lập", on_click=_set_sample, args=("neutral",), width="stretch")
+            lbl, b1, b2, b3 = st.columns([0.7, 1, 1, 1.1], vertical_alignment="center")
+            lbl.markdown('<div class="foot" style="margin:0">Câu mẫu:</div>', unsafe_allow_html=True)
+            b1.button("Tích cực", on_click=_set_sample, args=("positive",), width="stretch")
+            b2.button("Tiêu cực", on_click=_set_sample, args=("negative",), width="stretch")
+            b3.button("Trung lập", on_click=_set_sample, args=("neutral",), width="stretch")
             user_text = st.text_area(
                 "Nội dung bài đăng",
                 key="live_text",
@@ -930,14 +933,14 @@ def render_live_prediction_section(
                 label_visibility="collapsed",
                 placeholder="Ví dụ: Great service and friendly team, thank you so much! ❤️",
             )
-            r1, r2 = st.columns([2, 1], vertical_alignment="center")
+            r1, r2 = st.columns([1.4, 1], vertical_alignment="center")
             pred_model_name = r1.radio(
                 "Mô hình:",
                 options=["Naive Bayes", "Decision Tree"],
                 index=0 if default_model == "Naive Bayes" else 1,
                 horizontal=True,
             )
-            r2.button("✨ Dự đoán cảm xúc", type="primary", width="stretch")
+            r2.button("✨ Dự đoán", type="primary", width="stretch")
 
     with right:
         with st.container(border=True):
